@@ -1,4 +1,5 @@
 package com.uasz.gestion_utilisateur_service.entity;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -30,7 +31,7 @@ public class Utilisateur {
     private String email;
 
     @NotBlank
-    @Column(name = "mot_de_passe", nullable = false)
+    @Column(name = "mot_de_passe", nullable = false, length = 255)
     private String motDePasse;
 
     @Enumerated(EnumType.STRING)

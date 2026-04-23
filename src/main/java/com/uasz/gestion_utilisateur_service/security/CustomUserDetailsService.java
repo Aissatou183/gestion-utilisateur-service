@@ -1,4 +1,5 @@
 package com.uasz.gestion_utilisateur_service.security;
+
 import java.util.Collections;
 
 import com.uasz.gestion_utilisateur_service.entity.Utilisateur;
@@ -8,6 +9,7 @@ import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {

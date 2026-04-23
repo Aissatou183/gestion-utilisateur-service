@@ -1,12 +1,13 @@
 package com.uasz.gestion_utilisateur_service.controller;
+
 import com.uasz.gestion_utilisateur_service.dto.AuthRequest;
 import com.uasz.gestion_utilisateur_service.dto.AuthResponse;
 import com.uasz.gestion_utilisateur_service.service.AuthService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

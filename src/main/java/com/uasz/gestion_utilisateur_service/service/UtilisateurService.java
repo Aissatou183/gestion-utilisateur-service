@@ -22,29 +22,28 @@ public class UtilisateurService {
     private final EnseignantRepository enseignantRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // ================= CREATE =================
-
     public UtilisateurResponse createEtudiant(CreateEtudiantRequest request) {
 
         String email = request.getEmail().trim().toLowerCase();
+        String matricule = request.getMatricule().trim();
 
         if (utilisateurRepository.existsByEmail(email)) {
             throw new BadRequestException("Cet email existe déjà");
         }
 
-        if (etudiantRepository.existsByMatricule(request.getMatricule())) {
+        if (etudiantRepository.existsByMatricule(matricule)) {
             throw new BadRequestException("Ce matricule existe déjà");
         }
 
         Etudiant etudiant = new Etudiant();
-        etudiant.setNom(request.getNom());
-        etudiant.setPrenom(request.getPrenom());
+        etudiant.setNom(request.getNom().trim());
+        etudiant.setPrenom(request.getPrenom().trim());
         etudiant.setEmail(email);
         etudiant.setMotDePasse(passwordEncoder.encode(request.getMotDePasse()));
         etudiant.setRole(Role.ETUDIANT);
-        etudiant.setMatricule(request.getMatricule());
-        etudiant.setFiliere(request.getFiliere());
-        etudiant.setNiveau(request.getNiveau());
+        etudiant.setMatricule(matricule);
+        etudiant.setFiliere(request.getFiliere() != null ? request.getFiliere().trim() : null);
+        etudiant.setNiveau(request.getNiveau() != null ? request.getNiveau().trim() : null);
 
         return mapToResponse(etudiantRepository.save(etudiant));
     }
@@ -52,26 +51,27 @@ public class UtilisateurService {
     public UtilisateurResponse createEnseignant(CreateEnseignantRequest request) {
 
         String email = request.getEmail().trim().toLowerCase();
+        Integer nombreMaxProjets = request.getNombreMaxProjets() != null ? request.getNombreMaxProjets() : 5;
 
         if (utilisateurRepository.existsByEmail(email)) {
             throw new BadRequestException("Cet email existe déjà");
         }
 
+        if (nombreMaxProjets <= 0) {
+            throw new BadRequestException("Le nombre maximal de projets doit être supérieur à 0");
+        }
+
         Enseignant enseignant = new Enseignant();
-        enseignant.setNom(request.getNom());
-        enseignant.setPrenom(request.getPrenom());
+        enseignant.setNom(request.getNom().trim());
+        enseignant.setPrenom(request.getPrenom().trim());
         enseignant.setEmail(email);
         enseignant.setMotDePasse(passwordEncoder.encode(request.getMotDePasse()));
         enseignant.setRole(Role.ENSEIGNANT);
-        enseignant.setSpecialite(request.getSpecialite());
-        enseignant.setNombreMaxProjets(
-                request.getNombreMaxProjets() != null ? request.getNombreMaxProjets() : 5
-        );
+        enseignant.setSpecialite(request.getSpecialite() != null ? request.getSpecialite().trim() : null);
+        enseignant.setNombreMaxProjets(nombreMaxProjets);
 
         return mapToResponse(enseignantRepository.save(enseignant));
     }
-
-    // ================= READ =================
 
     public List<UtilisateurResponse> getAllUtilisateurs() {
         return utilisateurRepository.findAll()
@@ -87,8 +87,6 @@ public class UtilisateurService {
         return mapToResponse(utilisateur);
     }
 
-    // ================= UPDATE =================
-
     public UtilisateurResponse updateEtudiant(Long id, UpdateEtudiantRequest request) {
 
         Utilisateur utilisateur = utilisateurRepository.findById(id)
@@ -99,22 +97,23 @@ public class UtilisateurService {
         }
 
         String email = request.getEmail().trim().toLowerCase();
+        String matricule = request.getMatricule().trim();
 
         if (!etudiant.getEmail().equals(email) && utilisateurRepository.existsByEmail(email)) {
             throw new BadRequestException("Cet email existe déjà");
         }
 
-        if (!etudiant.getMatricule().equals(request.getMatricule())
-                && etudiantRepository.existsByMatricule(request.getMatricule())) {
+        if (!etudiant.getMatricule().equals(matricule)
+                && etudiantRepository.existsByMatricule(matricule)) {
             throw new BadRequestException("Ce matricule existe déjà");
         }
 
-        etudiant.setNom(request.getNom());
-        etudiant.setPrenom(request.getPrenom());
+        etudiant.setNom(request.getNom().trim());
+        etudiant.setPrenom(request.getPrenom().trim());
         etudiant.setEmail(email);
-        etudiant.setMatricule(request.getMatricule());
-        etudiant.setFiliere(request.getFiliere());
-        etudiant.setNiveau(request.getNiveau());
+        etudiant.setMatricule(matricule);
+        etudiant.setFiliere(request.getFiliere() != null ? request.getFiliere().trim() : null);
+        etudiant.setNiveau(request.getNiveau() != null ? request.getNiveau().trim() : null);
 
         return mapToResponse(etudiantRepository.save(etudiant));
     }
@@ -134,19 +133,20 @@ public class UtilisateurService {
             throw new BadRequestException("Cet email existe déjà");
         }
 
-        enseignant.setNom(request.getNom());
-        enseignant.setPrenom(request.getPrenom());
+        enseignant.setNom(request.getNom().trim());
+        enseignant.setPrenom(request.getPrenom().trim());
         enseignant.setEmail(email);
-        enseignant.setSpecialite(request.getSpecialite());
+        enseignant.setSpecialite(request.getSpecialite() != null ? request.getSpecialite().trim() : null);
 
         if (request.getNombreMaxProjets() != null) {
+            if (request.getNombreMaxProjets() <= 0) {
+                throw new BadRequestException("Le nombre maximal de projets doit être supérieur à 0");
+            }
             enseignant.setNombreMaxProjets(request.getNombreMaxProjets());
         }
 
         return mapToResponse(enseignantRepository.save(enseignant));
     }
-
-    // ================= DELETE =================
 
     public void deleteUtilisateur(Long id) {
 
@@ -160,8 +160,6 @@ public class UtilisateurService {
         utilisateurRepository.delete(utilisateur);
     }
 
-    // ================= PASSWORD =================
-
     public void changePassword(Long id, ChangePasswordRequest request) {
 
         Utilisateur utilisateur = utilisateurRepository.findById(id)
@@ -174,8 +172,6 @@ public class UtilisateurService {
         utilisateur.setMotDePasse(passwordEncoder.encode(request.getNouveauMotDePasse()));
         utilisateurRepository.save(utilisateur);
     }
-
-    // ================= MAPPER =================
 
     private UtilisateurResponse mapToResponse(Utilisateur utilisateur) {
 
@@ -198,5 +194,17 @@ public class UtilisateurService {
         }
 
         return builder.build();
+    }
+    public List<UtilisateurResponse> getAllEnseignants() {
+        return utilisateurRepository.findByRole(Role.ENSEIGNANT)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+    public List<UtilisateurResponse> getAllEtudiants() {
+        return utilisateurRepository.findByRole(Role.ETUDIANT)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 }

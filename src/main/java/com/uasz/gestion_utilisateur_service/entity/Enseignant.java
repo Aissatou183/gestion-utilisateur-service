@@ -1,4 +1,5 @@
 package com.uasz.gestion_utilisateur_service.entity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

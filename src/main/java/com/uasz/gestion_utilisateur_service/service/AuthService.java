@@ -1,31 +1,32 @@
 package com.uasz.gestion_utilisateur_service.service;
+
 import com.uasz.gestion_utilisateur_service.dto.AuthRequest;
 import com.uasz.gestion_utilisateur_service.dto.AuthResponse;
 import com.uasz.gestion_utilisateur_service.entity.Utilisateur;
-import com.uasz.gestion_utilisateur_service.exception.ResourceNotFoundException;
+import com.uasz.gestion_utilisateur_service.exception.BadRequestException;
 import com.uasz.gestion_utilisateur_service.repository.UtilisateurRepository;
 import com.uasz.gestion_utilisateur_service.security.JwtService;
-import org.springframework.security.authentication.*;
-import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final AuthenticationManager authenticationManager;
     private final UtilisateurRepository utilisateurRepository;
+    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public AuthResponse login(AuthRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getMotDePasse()
-                )
-        );
+        String email = request.getEmail().trim().toLowerCase();
 
-        Utilisateur utilisateur = utilisateurRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("Email ou mot de passe incorrect"));
+
+        if (!passwordEncoder.matches(request.getMotDePasse(), utilisateur.getMotDePasse())) {
+            throw new BadRequestException("Email ou mot de passe incorrect");
+        }
 
         String token = jwtService.generateToken(utilisateur);
 

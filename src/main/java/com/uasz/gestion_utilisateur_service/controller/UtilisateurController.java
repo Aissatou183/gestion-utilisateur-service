@@ -44,6 +44,11 @@ public class UtilisateurController {
         return ResponseEntity.ok(utilisateurService.getAllUtilisateurs());
     }
 
+    @GetMapping("/enseignants")
+    public ResponseEntity<List<UtilisateurResponse>> getAllEnseignants() {
+        return ResponseEntity.ok(utilisateurService.getAllEnseignants());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<UtilisateurResponse> getUtilisateurById(@PathVariable Long id) {
         return ResponseEntity.ok(utilisateurService.getUtilisateurById(id));
@@ -78,5 +83,9 @@ public class UtilisateurController {
     public ResponseEntity<Map<String, Object>> deleteUtilisateur(@PathVariable Long id) {
         utilisateurService.deleteUtilisateur(id);
         return ResponseEntity.ok(Map.of("message", "Utilisateur supprimé avec succès"));
+    }
+    @GetMapping("/etudiants")
+    public ResponseEntity<List<UtilisateurResponse>> getAllEtudiants() {
+        return ResponseEntity.ok(utilisateurService.getAllEtudiants());
     }
 }

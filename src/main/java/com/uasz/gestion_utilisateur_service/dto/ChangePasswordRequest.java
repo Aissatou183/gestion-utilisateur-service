@@ -1,4 +1,5 @@
 package com.uasz.gestion_utilisateur_service.dto;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +8,6 @@ import lombok.Setter;
 @Setter
 public class ChangePasswordRequest {
 
-    @NotBlank
+    @NotBlank(message = "Le nouveau mot de passe est obligatoire")
     private String nouveauMotDePasse;
 }
